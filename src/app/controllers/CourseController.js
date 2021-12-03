@@ -8,7 +8,6 @@ class CourseController {
         res.render("courses/show", { course: mogooseToObject(course) });
       })
       .catch(next);
-    // res.send("CourseController detail!! - " + req.params.slug);
   }
 
   //[GET] /courses/create
@@ -18,12 +17,12 @@ class CourseController {
 
   //[POST] /courses/store
   store(req, res, next) {
-    const formData = req.body;
+    const formData = {...req.body};
     formData.image = `https://img.youtube.com/vi/${formData.videoId}/sddefault.jpg`;
     const course = new Course(formData);
     course
       .save()
-      .then(() => res.redirect("/"))
+      .then(() => res.redirect("/me/stored/course"))
       .catch((error) => {});
   }
 
@@ -45,9 +44,37 @@ class CourseController {
 
   //[DELETE] /courses/:id
   destroy(req, res, next) {
+    Course.delete({_id: req.params.id})
+      .then(course => res.redirect('back'))
+      .catch(next);
+  }
+
+  //[PATCH] /courses/:id/restore
+  restore(req, res, next) {
+    Course.restore({_id: req.params.id})
+      .then(course => res.redirect('back'))
+      .catch(next);
+  }
+
+  //[DELETE] /courses/:id/force
+  forceDestroy (req, res, next) {
     Course.deleteOne({_id: req.params.id})
       .then(course => res.redirect('back'))
       .catch(next);
+  }
+
+  //[POST] /courses/handle-form-actions
+  handleFormActons (req, res, next) {
+    switch(req.body.action) {
+      case 'delete':
+        Course.delete({ _id: { $in: req.body.courseIds } })
+          .then(course => res.redirect('back'))
+          .catch(next);
+        break;
+
+      default :
+        res.json({messenge: 'Action is invalid'});
+    }
   }
 }
 
