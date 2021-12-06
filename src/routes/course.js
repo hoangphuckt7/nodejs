@@ -4,8 +4,12 @@ const courseController = require("../app/controllers/CourseController");
 
 router.get("/create", courseController.create);
 router.post("/store", courseController.store);
-router.post("/handle-form-actions", courseController.handleFormActons);
 router.get("/:id/edit", courseController.edit);
+router.post("/handle-form-actions", courseController.handleFormActons);
+router.post(
+  "/handle-form-actions/trash",
+  courseController.handleFormActonsTrash
+);
 router.put("/:id", courseController.update);
 router.patch("/:id/restore", courseController.restore);
 router.delete("/:id", courseController.destroy);
